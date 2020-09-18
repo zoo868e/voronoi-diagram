@@ -38,8 +38,14 @@ def plumb(edge):
 	old_k = (y2-y1)/(x2-x1)
 	m = -(x2-x1)/(y2-y1)
 	b = y_mid - m*x_mid
-	node1 = Node((-b)/m,0)
-	node2 = Node(0,b)
+	if (-b)/m < 0:
+		node1 = Node(600,600*m+b)
+	else:
+		node1 = Node((-b)/m,0)
+	if b < 0:
+		node2 = Node((600-b)/m,600)
+	else:
+		node2 = Node(0,b)
 	plumb_edge = Edge(node1,node2)
 	return plumb_edge
 
