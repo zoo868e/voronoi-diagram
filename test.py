@@ -18,12 +18,13 @@ edge = []
 
 def paint(event):
 	python_green = "#476042"
-	list_node.append(Node(event.x,event.y))
+	node = Node(event.x,event.y)
+	list_node.append(node)
 	#x1, y1 = (event.x - 1), (event.y - 1)
 	#x2, y2 = (event.x + 1), (event.y + 1)
 	#w.create_oval(x1, y1, x2, y2, fill=python_green)
 	draw_node()
-	print("x = "+str(list_node[len(list_node)-1].x)+",y = "+str(list_node[len(list_node)-1].y))
+	#print("x = "+str(node.x)+",y = "+str(node.y))
 	#if len(list_node) > 1:
 	#	gen_edge(list_node[len(list_node)-1])
 	#	draw_node()
@@ -60,7 +61,10 @@ def clean():
 	list_edge.clear()
 
 def draw_node():
+	list_node.sort(key= lambda s: s.x)
+	print("resorted!!")
 	for i in range(0,len(list_node)):
+		print("x = "+str(list_node[i].x)+",y = "+str(list_node[i].y))
 		x1, y1 = (list_node[i].x-1), (list_node[i].y-1)
 		x2, y2 = (list_node[i].x+1), (list_node[i].y+1)
 		w.create_oval(x1, y1, x2, y2, fill='black')
@@ -101,14 +105,44 @@ def draw_3point(nodea,nodeb,nodec):
 	node2 = Node((nodec.x+nodeb.x)/2,(nodec.y+nodeb.y)/2)
 	node3 = Node((nodea.x+nodec.x)/2,(nodea.y+nodec.y)/2)
 
-	edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
+	e1 = cal_distance(nodea,nodeb)
+	e2 = cal_distance(nodeb,nodec)
+	e3 = cal_distance(nodea,nodec)
+
+	emax = max(e1,e2,e3)
+	if e1 == emax:
+		if e2+e3 < e1:
+			edge1 = Edge(node_cir,Node(node1.x+600*(node_cir.x-node1.x),node1.y+600*(node_cir.y-node1.y)))
+		else:
+			edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
+	else:
+		edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
+
+	if e2 == emax:
+		if e1+e3 < e2:
+			edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),ndoe2.y+600*(node_cir.y-node2.y)))
+		else:
+			edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
+	else:
+		edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
+
+	if e3 == emax:
+		if e2+e1 < e3:
+			edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),ndoe3.y+600*(node_cir.y-node3.y)))
+		else:
+			edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
+	else:
+		edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
+
+
 	draw_edge(edge1)
-	edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
 	draw_edge(edge2)
-	edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
 	draw_edge(edge3)
-
-
+	
+def cal_distance(node1,node2):
+	x = (node1.x - node2.x) ** 2
+	y = (node1.y - node2.y) **2
+	return x + y
 
 master = Tk()
 master.title("Points")
