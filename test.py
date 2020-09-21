@@ -1,4 +1,5 @@
 from tkinter import *
+from operator import itemgetter,attrgetter
 
 class Node:
 	def __init__(self,x,y):
@@ -36,8 +37,10 @@ def plumb(edge):
 	x2, y2 = (edge.node2.x,edge.node2.y)
 	x_mid = (x1+x2)/2
 	y_mid = (y1+y2)/2
-	if (x2-x1) == 0 or (y2-y1) == 0:
-		return Edge(Node(0,0),Node(0,0))
+	if (x2-x1) == 0 and (y2-y1) != 0:
+		return Edge(Node(0,(y2+y1)/2),Node(600,(y2+y1)/2))
+	if (y2-y1) == 0 and (x2-x1) != 0:
+		return Edge(Node((x2+x1)/2,0),Node((x2+x1)/2,600))
 	old_k = (y2-y1)/(x2-x1)
 	m = -(x2-x1)/(y2-y1)
 	if m == 0:
@@ -138,7 +141,10 @@ def draw_3point(nodea,nodeb,nodec):
 	else:
 		edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
 
-
+	list_edge.append(edge1)
+	list_edge.append(edge2)
+	list_edge.append(edge3)
+	list_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
 	draw_edge(edge1)
 	draw_edge(edge2)
 	draw_edge(edge3)
