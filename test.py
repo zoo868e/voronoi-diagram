@@ -80,12 +80,16 @@ def gen_edge(node):
 def run():
 	list_edge.clear()
 	print("clear the list_edge")
-	for i in range(0,len(list_node)-2):
-		for j in range(i+1,len(list_node)-1):
-			for k in range(j+1,len(list_node)):
-				draw_3point(list_node[i],list_node[j],list_node[k])
-				node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
-				w.create_oval(node.x-5,node.y-5,node.x+5,node.y+5,fill="red")
+	if len(list_node) == 2:
+		draw_2point(list_node[0],list_node[1])
+	elif len(list_node) == 3:
+	
+		for i in range(0,len(list_node)-2):
+			for j in range(i+1,len(list_node)-1):
+				for k in range(j+1,len(list_node)):
+					draw_3point(list_node[i],list_node[j],list_node[k])
+					node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
+					w.create_oval(node.x-5,node.y-5,node.x+5,node.y+5,fill="red")
 			#list_edge.append(Edge(list_node[i],list_node[j]))
 			#draw_edge(list_edge[len(list_edge)-1])
 
@@ -120,7 +124,7 @@ def draw_3point(nodea,nodeb,nodec):
 
 	if e2 == emax:
 		if e1+e3 < e2:
-			edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),ndoe2.y+600*(node_cir.y-node2.y)))
+			edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),node2.y+600*(node_cir.y-node2.y)))
 		else:
 			edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
 	else:
@@ -128,7 +132,7 @@ def draw_3point(nodea,nodeb,nodec):
 
 	if e3 == emax:
 		if e2+e1 < e3:
-			edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),ndoe3.y+600*(node_cir.y-node3.y)))
+			edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),node3.y+600*(node_cir.y-node3.y)))
 		else:
 			edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
 	else:
@@ -138,6 +142,10 @@ def draw_3point(nodea,nodeb,nodec):
 	draw_edge(edge1)
 	draw_edge(edge2)
 	draw_edge(edge3)
+
+def draw_2point(nodea,nodeb):
+	edge = plumb(Edge(nodea,nodeb))
+	draw_edge(edge)
 	
 def cal_distance(node1,node2):
 	x = (node1.x - node2.x) ** 2
