@@ -1,5 +1,6 @@
 from tkinter import *
 from operator import itemgetter,attrgetter
+from tkinter.filedialog import askopenfilename
 
 class Node:
 	def __init__(self,x,y):
@@ -158,6 +159,16 @@ def cal_distance(node1,node2):
 	y = (node1.y - node2.y) **2
 	return x + y
 
+def rfile():
+	filename = askopenfilename()
+	print(filename)
+	fp = open(filename,"r")
+	lines = fp.readlines()
+	fp.close()
+	for i in range(len(lines)):
+		if lines[i][0] != "#":
+			print(lines[i])
+
 master = Tk()
 master.title("Points")
 master.resizable(0,0)
@@ -173,5 +184,8 @@ btn_clear.pack()
 
 btn_run = Button(master, text="Run",command = run)
 btn_run.pack()
+
+btn_open_file = Button(master,text="Open",command = rfile)
+btn_open_file.pack()
 
 mainloop()
