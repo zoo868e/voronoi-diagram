@@ -16,7 +16,9 @@ canvas_width = 600
 canvas_height = 600
 list_node = []
 list_edge = []
+list_draw_edge = []
 edge = []
+list_read_node = []
 
 def paint(event):
 	python_green = "#476042"
@@ -63,6 +65,7 @@ def clean():
 	w.delete('all')
 	list_node.clear()
 	list_edge.clear()
+	list_draw_list.clear()
 
 def draw_node():
 	list_node.sort(key= lambda s: s.x)
@@ -104,6 +107,8 @@ def cal_Circumscribed(node1,node2,node3):
 	b1 = edge1.node1.y - (edge1.node1.x * a1)
 	a2 = (edge2.node1.y - edge2.node2.y)/(edge2.node1.x - edge2.node2.x)
 	b2 = edge2.node1.y - (edge2.node1.x * a2)
+	if a1 == a2:
+		return Node(-1,-1)
 	node = Node((b2-b1)/(a1-a2),a1*(b2-b1)/(a1-a2)+b1)
 	return node
 
@@ -117,38 +122,60 @@ def draw_3point(nodea,nodeb,nodec):
 	e2 = cal_distance(nodeb,nodec)
 	e3 = cal_distance(nodea,nodec)
 
-	emax = max(e1,e2,e3)
-	if e1 == emax:
-		if e2+e3 < e1:
-			edge1 = Edge(node_cir,Node(node1.x+600*(node_cir.x-node1.x),node1.y+600*(node_cir.y-node1.y)))
+	if node_cir.x != -1:
+		emax = max(e1,e2,e3)
+		if e1 == emax:
+			if e2+e3 < e1:
+				edge1 = Edge(node_cir,Node(node1.x+600*(node_cir.x-node1.x),node1.y+600*(node_cir.y-node1.y)))
+			else:
+				edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
 		else:
 			edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
-	else:
-		edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
-
-	if e2 == emax:
-		if e1+e3 < e2:
-			edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),node2.y+600*(node_cir.y-node2.y)))
+	
+		if e2 == emax:
+			if e1+e3 < e2:
+				edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),node2.y+600*(node_cir.y-node2.y)))
+			else:
+				edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
 		else:
 			edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
-	else:
-		edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
-
-	if e3 == emax:
-		if e2+e1 < e3:
-			edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),node3.y+600*(node_cir.y-node3.y)))
+	
+		if e3 == emax:
+			if e2+e1 < e3:
+				edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),node3.y+600*(node_cir.y-node3.y)))
+			else:
+				edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
 		else:
 			edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
-	else:
-		edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
+	
 
-	list_edge.append(edge1)
-	list_edge.append(edge2)
-	list_edge.append(edge3)
-	list_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
-	draw_edge(edge1)
-	draw_edge(edge2)
-	draw_edge(edge3)
+		list_edge.append(edge1)
+		list_edge.append(edge2)
+		list_edge.append(edge3)
+		list_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
+		draw_edge(edge1)
+		draw_edge(edge2)
+		draw_edge(edge3)
+
+
+
+	else:
+		emax = max(e1,e2,e3)
+		if e1 == emax:
+			print('')
+		else:
+			list_draw_edge.append(plumb(Edge(nodea,nodeb)))
+		if e2 == emax:
+			print('')
+		else:
+			list_draw_edge.append(plumb(Edge(nodeb,nodec)))
+		if e3 == emax:
+			print('')
+		else:
+			list_draw_edge.append(plumb(Edge(nodea,nodec)))
+		for item in list_draw_edge:
+			draw_edge(item)
+		
 
 def draw_2point(nodea,nodeb):
 	edge = plumb(Edge(nodea,nodeb))
@@ -165,9 +192,33 @@ def rfile():
 	fp = open(filename,"r")
 	lines = fp.readlines()
 	fp.close()
-	for i in range(len(lines)):
-		if lines[i][0] != "#":
-			print(lines[i])
+	len_lines = len(lines)
+	flag = 0
+	count = 0
+	for i in range(len_lines):
+		if lines[i][0] == '0':
+			break
+		if lines[i][0] != "#" and lines[i][0] != '\n' and flag == 0:
+			list_node.clear()
+			num = lines[i].split('\n',1)
+			num_node = int(num[0])
+			flag = num_node + 1
+			for x in range(1,num_node+1):
+				temp = lines[x+i].split(' ',2)
+				temp1 = temp[1].split('\n',1)
+				list_node.append(Node(int(temp[0]),int(temp1[0])))
+				temp = list_node
+
+			for x in list_node:
+				print("("+str(x.x)+","+str(x.y)+")")
+			print("---------------------------------------")
+			list_read_node.append(list_node)
+		elif flag != 0:
+			flag = flag - 1
+	for i in range(len(list_read_node)):
+		print("---------------------------------")
+		for item in list_read_node[i]:
+			print("("+str(item.x)+","+str(item.y)+")")
 
 master = Tk()
 master.title("Points")
