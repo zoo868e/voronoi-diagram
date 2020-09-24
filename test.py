@@ -1,6 +1,7 @@
 from tkinter import *
 from operator import itemgetter,attrgetter
 from tkinter.filedialog import askopenfilename
+from tkinter import ttk
 
 class Node:
 	def __init__(self,x,y):
@@ -19,6 +20,7 @@ list_edge = []
 list_draw_edge = []
 edge = []
 list_read_node = []
+count_readed_node = [0]
 
 def paint(event):
 	python_green = "#476042"
@@ -65,7 +67,7 @@ def clean():
 	w.delete('all')
 	list_node.clear()
 	list_edge.clear()
-	list_draw_list.clear()
+	list_draw_edge.clear()
 
 def draw_node():
 	list_node.sort(key= lambda s: s.x)
@@ -75,7 +77,6 @@ def draw_node():
 		x1, y1 = (list_node[i].x-1), (list_node[i].y-1)
 		x2, y2 = (list_node[i].x+1), (list_node[i].y+1)
 		w.create_oval(x1, y1, x2, y2, fill='black')
-	
 def draw_edge(edge):
 	w.create_line(edge.node1.x, edge.node1.y, edge.node2.x, edge.node2.y)
 	print("Edge plot: (" + str(edge.node1.x) + "," + str(edge.node1.y) + ") to (" + str(edge.node2.x) + "," + str(edge.node2.y) + ")")
@@ -90,7 +91,6 @@ def run():
 	if len(list_node) == 2:
 		draw_2point(list_node[0],list_node[1])
 	elif len(list_node) == 3:
-	
 		for i in range(0,len(list_node)-2):
 			for j in range(i+1,len(list_node)-1):
 				for k in range(j+1,len(list_node)):
@@ -131,7 +131,6 @@ def draw_3point(nodea,nodeb,nodec):
 				edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
 		else:
 			edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
-	
 		if e2 == emax:
 			if e1+e3 < e2:
 				edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),node2.y+600*(node_cir.y-node2.y)))
@@ -139,7 +138,6 @@ def draw_3point(nodea,nodeb,nodec):
 				edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
 		else:
 			edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
-	
 		if e3 == emax:
 			if e2+e1 < e3:
 				edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),node3.y+600*(node_cir.y-node3.y)))
@@ -147,7 +145,6 @@ def draw_3point(nodea,nodeb,nodec):
 				edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
 		else:
 			edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
-	
 
 		list_edge.append(edge1)
 		list_edge.append(edge2)
@@ -175,19 +172,19 @@ def draw_3point(nodea,nodeb,nodec):
 			list_draw_edge.append(plumb(Edge(nodea,nodec)))
 		for item in list_draw_edge:
 			draw_edge(item)
-		
 
 def draw_2point(nodea,nodeb):
 	edge = plumb(Edge(nodea,nodeb))
 	draw_edge(edge)
-	
 def cal_distance(node1,node2):
 	x = (node1.x - node2.x) ** 2
 	y = (node1.y - node2.y) **2
 	return x + y
 
 def rfile():
+	list_read_node.clear()
 	filename = askopenfilename()
+	read_node_num = 0
 	print(filename)
 	fp = open(filename,"r")
 	lines = fp.readlines()
@@ -207,18 +204,37 @@ def rfile():
 				temp = lines[x+i].split(' ',2)
 				temp1 = temp[1].split('\n',1)
 				list_node.append(Node(int(temp[0]),int(temp1[0])))
-				temp = list_node
+				temp = list_node.copy()
 
-			for x in list_node:
-				print("("+str(x.x)+","+str(x.y)+")")
-			print("---------------------------------------")
-			list_read_node.append(list_node)
+			list_read_node.append(temp)
 		elif flag != 0:
 			flag = flag - 1
 	for i in range(len(list_read_node)):
 		print("---------------------------------")
 		for item in list_read_node[i]:
 			print("("+str(item.x)+","+str(item.y)+")")
+	draw_input(0)
+
+def next_input():
+	if count_readed_node[0] < len(list_read_node) - 1:
+		count_readed_node[0] = count_readed_node[0] + 1
+
+	print(count_readed_node[0])
+	draw_input(count_readed_node[0])
+
+def previous_input():
+	if count_readed_node[0] > 0:
+		count_readed_node[0] = count_readed_node[0] - 1
+
+	print(count_readed_node[0])
+	draw_input(count_readed_node[0])
+
+def draw_input(c):
+	list_node.clear()
+	w.delete('all')
+	for item in list_read_node[c]:
+		list_node.append(item)
+	draw_node()
 
 master = Tk()
 master.title("Points")
@@ -228,7 +244,7 @@ w.pack(expand=YES, fill=BOTH)
 w.bind("<ButtonRelease-1>", paint)
 
 message = Label(master, text="Press and Drag the mouse to draw")
-message.pack(side=BOTTOM)
+message.pack()
 
 btn_clear = Button(master, text="clear",command=clean)
 btn_clear.pack()
@@ -239,4 +255,8 @@ btn_run.pack()
 btn_open_file = Button(master,text="Open",command = rfile)
 btn_open_file.pack()
 
+next_input = Button(master, text="next input", command = next_input)
+next_input.pack()
+previous_input = Button(master, text="previous input", command = previous_input)
+previous_input.pack()
 mainloop()
