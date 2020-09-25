@@ -21,6 +21,7 @@ list_draw_edge = []
 edge = []
 list_read_node = []
 count_readed_node = [0]
+output_edge = []
 
 def paint(event):
 	python_green = "#476042"
@@ -87,6 +88,7 @@ def gen_edge(node):
 
 def run():
 	list_edge.clear()
+	output_edge.clear()
 	print("clear the list_edge")
 	if len(list_node) == 2:
 		draw_2point(list_node[0],list_node[1])
@@ -153,6 +155,8 @@ def draw_3point(nodea,nodeb,nodec):
 		draw_edge(edge1)
 		draw_edge(edge2)
 		draw_edge(edge3)
+		for i in list_edge:
+			output_edge.append(i)
 
 
 
@@ -172,9 +176,12 @@ def draw_3point(nodea,nodeb,nodec):
 			list_draw_edge.append(plumb(Edge(nodea,nodec)))
 		for item in list_draw_edge:
 			draw_edge(item)
+			output_edge.append(item)
+
 
 def draw_2point(nodea,nodeb):
 	edge = plumb(Edge(nodea,nodeb))
+	output_edge.append(edge)
 	draw_edge(edge)
 def cal_distance(node1,node2):
 	x = (node1.x - node2.x) ** 2
@@ -236,6 +243,16 @@ def draw_input(c):
 		list_node.append(item)
 	draw_node()
 
+def output_file():
+	out = open('out.txt',"w")
+	for i in list_node:
+		out.write("P "+str(i.x)+" "+str(i.y)+"\n")
+
+	for i in output_edge:
+		out.write("E "+str(i.node1.x)+" "+str(i.node1.y)+" "+str(i.node2.x)+" "+str(i.node2.y)+"\n")
+
+	out.close()
+
 master = Tk()
 master.title("Points")
 master.resizable(0,0)
@@ -259,4 +276,8 @@ next_input = Button(master, text="next input", command = next_input)
 next_input.pack()
 previous_input = Button(master, text="previous input", command = previous_input)
 previous_input.pack()
+
+out_btn = Button(master,text='Output file',command = output_file)
+out_btn.pack()
+
 mainloop()
