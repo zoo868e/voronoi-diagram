@@ -22,11 +22,16 @@ edge = []
 list_read_node = []
 count_readed_node = [0]
 output_edge = []
+node_set = set()
 
 def paint(event):
-	python_green = "#476042"
+	#python_green = "#476042"
 	node = Node(event.x,event.y)
-	list_node.append(node)
+	node_set.add((int(node.x),int(node.y)))
+	print(node_set)
+	list_node.clear()
+	for i in node_set:
+		list_node.append(Node(int(i[0]),int(i[1])))
 	#x1, y1 = (event.x - 1), (event.y - 1)
 	#x2, y2 = (event.x + 1), (event.y + 1)
 	#w.create_oval(x1, y1, x2, y2, fill=python_green)
@@ -39,8 +44,8 @@ def paint(event):
 	#		draw_edge(edge)
 
 def plumb(edge):
-	x1, y1 = (edge.node1.x,edge.node1.y)
-	x2, y2 = (edge.node2.x,edge.node2.y)
+	x1, y1 = (int(edge.node1.x),int(edge.node1.y))
+	x2, y2 = (int(edge.node2.x),int(edge.node2.y))
 	x_mid = (x1+x2)/2
 	y_mid = (y1+y2)/2
 	if (x2-x1) == 0 and (y2-y1) != 0:
@@ -69,14 +74,14 @@ def clean():
 	list_node.clear()
 	list_edge.clear()
 	list_draw_edge.clear()
+	node_set.clear()
 
 def draw_node():
 	list_node.sort(key= lambda s: s.x)
 	print("resorted!!")
-	for i in range(0,len(list_node)):
-		print("x = "+str(list_node[i].x)+",y = "+str(list_node[i].y))
-		x1, y1 = (list_node[i].x-1), (list_node[i].y-1)
-		x2, y2 = (list_node[i].x+1), (list_node[i].y+1)
+	for i in list_node:
+		x1, y1 = int(i.x)-1, int(i.y)-1
+		x2, y2 = int(i.x)+1, int(i.y)+1
 		w.create_oval(x1, y1, x2, y2, fill='black')
 def draw_edge(edge):
 	w.create_line(edge.node1.x, edge.node1.y, edge.node2.x, edge.node2.y)
@@ -97,17 +102,27 @@ def run():
 			for j in range(i+1,len(list_node)-1):
 				for k in range(j+1,len(list_node)):
 					draw_3point(list_node[i],list_node[j],list_node[k])
-					node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
-					w.create_oval(node.x-5,node.y-5,node.x+5,node.y+5,fill="red")
+					#node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
+					#w.create_oval(node.x-5,node.y-5,node.x+5,node.y+5,fill="red")
 			#list_edge.append(Edge(list_node[i],list_node[j]))
 			#draw_edge(list_edge[len(list_edge)-1])
 
 def cal_Circumscribed(node1,node2,node3):
+	if node1.x == node2.x and node2.x == node3.x:
+		return Node(-1,-1)
+	if node1.y == node2.y and node2.y == node3.y:
+		return Node(-1,-1)
 	edge1 = plumb(Edge(node1,node2))
 	edge2 = plumb(Edge(node1,node3))
-	a1 = (edge1.node1.y - edge1.node2.y)/(edge1.node1.x - edge1.node2.x)
+	if edge1.node1.x == edge1.node2.x:
+		a1 = 0
+	else:
+		a1 = (edge1.node1.y - edge1.node2.y)/(edge1.node1.x - edge1.node2.x)
 	b1 = edge1.node1.y - (edge1.node1.x * a1)
-	a2 = (edge2.node1.y - edge2.node2.y)/(edge2.node1.x - edge2.node2.x)
+	if edge2.node1.x == edge2.node2.x:
+		a2 = 0
+	else:
+		a2 = (edge2.node1.y - edge2.node2.y)/(edge2.node1.x - edge2.node2.x)
 	b2 = edge2.node1.y - (edge2.node1.x * a2)
 	if a1 == a2:
 		return Node(-1,-1)
@@ -188,7 +203,11 @@ def cal_distance(node1,node2):
 	y = (node1.y - node2.y) **2
 	return x + y
 
-def rfile():
+def r_test_file():
+	clean()
+	count_readed_node.clear()
+	count_readed_node.append(0)
+	node_set.clear()
 	list_read_node.clear()
 	filename = askopenfilename()
 	read_node_num = 0
@@ -199,19 +218,23 @@ def rfile():
 	len_lines = len(lines)
 	flag = 0
 	count = 0
-	for i in range(len_lines):
+	for i in range(0,len_lines):
 		if lines[i][0] == '0':
 			break
 		if lines[i][0] != "#" and lines[i][0] != '\n' and flag == 0:
 			list_node.clear()
+			node_set.clear()
 			num = lines[i].split('\n',1)
 			num_node = int(num[0])
 			flag = num_node + 1
 			for x in range(1,num_node+1):
 				temp = lines[x+i].split(' ',2)
 				temp1 = temp[1].split('\n',1)
-				list_node.append(Node(int(temp[0]),int(temp1[0])))
-				temp = list_node.copy()
+				node_set.add((int(temp[0]),int(temp1[0])))
+				#list_node.append(Node(int(temp[0]),int(temp1[0])))
+			for j in node_set:
+				list_node.append(Node(j[0],j[1]))
+			temp = list_node.copy()
 
 			list_read_node.append(temp)
 		elif flag != 0:
@@ -223,6 +246,7 @@ def rfile():
 	draw_input(0)
 
 def next_input():
+	clean()
 	if count_readed_node[0] < len(list_read_node) - 1:
 		count_readed_node[0] = count_readed_node[0] + 1
 
@@ -230,6 +254,7 @@ def next_input():
 	draw_input(count_readed_node[0])
 
 def previous_input():
+	clean()
 	if count_readed_node[0] > 0:
 		count_readed_node[0] = count_readed_node[0] - 1
 
@@ -241,10 +266,14 @@ def draw_input(c):
 	w.delete('all')
 	for item in list_read_node[c]:
 		list_node.append(item)
+	for item in list_node:
+		print("("+str(item.x)+","+str(item.y)+")")
 	draw_node()
 
 def output_file():
 	out = open('out.txt',"w")
+	list_node.sort(key=attrgetter('x','y'))
+	output_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
 	for i in list_node:
 		out.write("P "+str(i.x)+" "+str(i.y)+"\n")
 
@@ -252,6 +281,25 @@ def output_file():
 		out.write("E "+str(i.node1.x)+" "+str(i.node1.y)+" "+str(i.node2.x)+" "+str(i.node2.y)+"\n")
 
 	out.close()
+
+
+def r_graph():
+	clean()
+	filename = askopenfilename()
+	f = open(filename,"r")
+	lines = f.readlines()
+	f.close()
+	for i in lines:
+		if i[0] == 'P':
+			item = i.split(" ",2)
+			list_node.append(Node(int(item[1]),int(item[2])))
+
+		if i[0] == 'E':
+			item = i.split(" ",4)
+			list_draw_edge.append(Edge(Node(item[1],item[2]),Node(item[3],item[4])))
+	for i in list_draw_edge:
+		draw_edge(i)
+	draw_node()
 
 master = Tk()
 master.title("Points")
@@ -269,7 +317,7 @@ btn_clear.pack()
 btn_run = Button(master, text="Run",command = run)
 btn_run.pack()
 
-btn_open_file = Button(master,text="Open",command = rfile)
+btn_open_file = Button(master,text="Open",command = r_test_file)
 btn_open_file.pack()
 
 next_input = Button(master, text="next input", command = next_input)
@@ -279,5 +327,8 @@ previous_input.pack()
 
 out_btn = Button(master,text='Output file',command = output_file)
 out_btn.pack()
+
+r_graph_btn = Button(master, text='Read Graph',command = r_graph)
+r_graph_btn.pack()
 
 mainloop()
