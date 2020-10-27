@@ -292,16 +292,22 @@ def draw_input(c):
 	draw_node()
 
 def output_file():
-	out = open('out.txt',"w")
-	list_node.sort(key=attrgetter('x','y'))
-	output_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
-	for i in list_node:
-		out.write("P "+str(i.x)+" "+str(i.y)+"\n")
+        out = open('輸出文字檔案',"w")
+        list_node.sort(key=attrgetter('x','y'))
+        for item in output_edge:
+            if item.node1.x > item.node2.x or (item.node1.x == item.node2.x and item.node1.y > item.node2.y):
+                temp1 = Node(item.node1.x,item.node1.y)
+                temp2 = Node(item.node2.x,item.node2.y)
+                item.node1 = temp2
+                item.node2 = temp1
+        output_edge.sort(key=attrgetter('node1.x','node1.y','node2.x','node2.y'))
+        for i in list_node:
+            out.write("P "+str(i.x)+" "+str(i.y)+"\n")
 
-	for i in output_edge:
-		out.write("E "+str(i.node1.x)+" "+str(i.node1.y)+" "+str(i.node2.x)+" "+str(i.node2.y)+"\n")
+        for i in output_edge:
+            out.write("E "+str(i.node1.x)+" "+str(i.node1.y)+" "+str(i.node2.x)+" "+str(i.node2.y)+"\n")
 
-	out.close()
+        out.close()
 
 
 def r_graph():
