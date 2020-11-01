@@ -24,6 +24,17 @@ count_readed_node = [0]
 output_edge = []
 node_set = set()
 
+
+def goline(startnode,endnode):
+    gox = endnode.x - startnode.x
+    goy = endnode.y - startnode.y
+    temp = Node(endnode.x,endnode.y)
+    while (temp.x > 0 and temp.x < 600) and (temp.y > 0 and temp.y < 600):
+        temp.x = temp.x + gox
+        temp.y = temp.y + goy
+    return temp
+
+
 def paint(event):
 	#python_green = "#476042"
 	node = Node(event.x,event.y)
@@ -103,7 +114,7 @@ def run():
 				for k in range(j+1,len(list_node)):
 					draw_3point(list_node[i],list_node[j],list_node[k])
 					node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
-					w.create_oval(node.x-5,node.y-5,node.x+5,node.y+5,fill="red")
+					w.create_oval(int(node.x)-5,int(node.y)-5,int(node.x)+5,int(node.y)+5,fill="red")
 			#list_edge.append(Edge(list_node[i],list_node[j]))
 			#draw_edge(list_edge[len(list_edge)-1])
 
@@ -140,7 +151,7 @@ def cal_Circumscribed(node1,node2,node3):
 		a2 = (edge2.node1.y - edge2.node2.y)/(edge2.node1.x - edge2.node2.x)
 	b2 = edge2.node1.y - (edge2.node1.x * a2)
 	if a1 == a2:
-		return Node(-1,-1)
+		return Node('-1','-1')
 	node = Node((b2-b1)/(a1-a2),a1*(b2-b1)/(a1-a2)+b1)
 	return node
 
@@ -158,31 +169,31 @@ def draw_3point(nodea,nodeb,nodec):
 		emax = max(e1,e2,e3)
 		if e1 == emax:
 			if e2+e3 < e1:
-				edge1 = Edge(node_cir,Node(node1.x+600*(node_cir.x-node1.x),node1.y+600*(node_cir.y-node1.y)))
+				edge1 = Edge(node_cir,goline(node1,node_cir))
 			elif e2+e3 == e1:
-				edge1 = Edge(node_cir,Node(600*(node_cir.x-nodec.x),600*(node_cir.y-nodec.y)))
+				edge1 = Edge(node_cir,goline(nodec,node_cir))
 			else:
-				edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
+				edge1 = Edge(node_cir,goline(node_cir,node1))
 		else:
-			edge1 = Edge(node_cir,Node(node1.x+600*(node1.x-node_cir.x),node1.y+600*(node1.y-node_cir.y)))
+			edge1 = Edge(node_cir,goline(node_cir,node1))
 		if e2 == emax:
 			if e1+e3 < e2:
-				edge2 = Edge(node_cir,Node(node2.x+600*(node_cir.x-node2.x),node2.y+600*(node_cir.y-node2.y)))
+				edge2 = Edge(node_cir,goline(node2,node_cir))
 			elif e1+e3 == e2:
-				edge2 = Edge(node_cir,Node(600*(node_cir.x-nodea.x),600*(node_cir.y-nodea.y)))
+				edge2 = Edge(node_cir,goline(nodea,node_cir))
 			else:
-				edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
+				edge2 = Edge(node_cir,goline(node_cir,node2))
 		else:
-			edge2 = Edge(node_cir,Node(node2.x+600*(node2.x-node_cir.x),node2.y+600*(node2.y-node_cir.y)))
+			edge2 = Edge(node_cir,goline(node_cir,node2))
 		if e3 == emax:
 			if e2+e1 < e3:
-				edge3 = Edge(node_cir,Node(node3.x+600*(node_cir.x-node3.x),node3.y+600*(node_cir.y-node3.y)))
+				edge3 = Edge(node_cir,goline(node3,node_cir))
 			elif e2+e1 == e3:
-				edge3 = Edge(node_cir,Node(600*(node_cir.x-nodeb.x),600*(node_cir.y-nodec.y)))
+				edge3 = Edge(node_cir,goline(nodeb,node_cir))
 			else:
-				edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
+				edge3 = Edge(node_cir,goline(node_cir,node3))
 		else:
-			edge3 = Edge(node_cir,Node(node3.x+600*(node3.x-node_cir.x),node3.y+600*(node3.y-node_cir.y)))
+			edge3 = Edge(node_cir,goline(node_cir,node3))
 
 		list_edge.append(edge1)
 		list_edge.append(edge2)
@@ -221,7 +232,7 @@ def draw_2point(nodea,nodeb):
 	draw_edge(edge)
 def cal_distance(node1,node2):
 	x = (node1.x - node2.x) ** 2
-	y = (node1.y - node2.y) **2
+	y = (node1.y - node2.y) ** 2
 	return x + y
 
 def r_test_file():
