@@ -1,4 +1,7 @@
-from tkinter import *
+##$LAN=PYTHON$##
+##M093040098 詹敬平##
+
+from tkinter import Tk,Canvas,YES,BOTH,Label,Button,mainloop
 from operator import itemgetter,attrgetter
 from tkinter.filedialog import askopenfilename
 from tkinter import ttk
@@ -114,7 +117,7 @@ def run():
 				for k in range(j+1,len(list_node)):
 					draw_3point(list_node[i],list_node[j],list_node[k])
 					node = cal_Circumscribed(list_node[i],list_node[j],list_node[k])
-					w.create_oval(int(node.x)-5,int(node.y)-5,int(node.x)+5,int(node.y)+5,fill="red")
+					#w.create_oval(int(node.x)-5,int(node.y)-5,int(node.x)+5,int(node.y)+5,fill="red")
 			#list_edge.append(Edge(list_node[i],list_node[j]))
 			#draw_edge(list_edge[len(list_edge)-1])
 
@@ -152,7 +155,10 @@ def cal_Circumscribed(node1,node2,node3):
 	b2 = edge2.node1.y - (edge2.node1.x * a2)
 	if a1 == a2:
 		return Node('-1','-1')
-	node = Node((b2-b1)/(a1-a2),a1*(b2-b1)/(a1-a2)+b1)
+	d = 2 * (node1.x * (node2.y - node3.y) + node2.x * (node3.y - node1.y) + node3.x * (node1.y - node2.y))
+	ux = ((node1.x * node1.x + node1.y * node1.y) * (node2.y - node3.y) + (node2.x * node2.x + node2.y * node2.y) * (node3.y - node1.y) + (node3.x * node3.x + node3.y * node3.y) * (node1.y - node2.y)) / d
+	uy = ((node1.x * node1.x + node1.y * node1.y) * (node3.x - node2.x) + (node2.x * node2.x + node2.y * node2.y) * (node1.x - node3.x) + (node3.x * node3.x + node3.y * node3.y) * (node2.x - node1.x)) / d
+	node = Node(ux,uy)
 	return node
 
 def draw_3point(nodea,nodeb,nodec):
@@ -202,6 +208,7 @@ def draw_3point(nodea,nodeb,nodec):
 		draw_edge(edge1)
 		draw_edge(edge2)
 		draw_edge(edge3)
+		print("cir:("+str(node_cir.x)+","+str(node_cir.y)+")")
 		for i in list_edge:
 			output_edge.append(i)
 
@@ -244,7 +251,7 @@ def r_test_file():
 	filename = askopenfilename()
 	read_node_num = 0
 	print(filename)
-	fp = open(filename,"r")
+	fp = open(filename,"r",encoding="utf-8")
 	lines = fp.readlines()
 	fp.close()
 	len_lines = len(lines)
