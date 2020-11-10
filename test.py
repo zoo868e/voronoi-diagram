@@ -264,17 +264,22 @@ def r_test_file():
 			list_node.clear()
 			node_set.clear()
 			num = lines[i].split('\n',1)
+			print("num: "+num[0])
 			num_node = int(num[0])
-			flag = num_node + 1
+			
+			flag = num_node
 			for x in range(1,num_node+1):
+				print("x: "+str(x))
 				temp = lines[x+i].split(' ',2)
+				print("temp: "+str(temp))
 				temp1 = temp[1].split('\n',1)
+				print("temp1: "+str(temp1))
 				node_set.add((int(temp[0]),int(temp1[0])))
 				#list_node.append(Node(int(temp[0]),int(temp1[0])))
 			for j in node_set:
+				print("("+str(j[0])+","+str(j[1])+")")
 				list_node.append(Node(j[0],j[1]))
 			temp = list_node.copy()
-
 			list_read_node.append(temp)
 		elif flag != 0:
 			flag = flag - 1
