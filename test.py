@@ -251,21 +251,23 @@ def r_test_file():
 	filename = askopenfilename()
 	read_node_num = 0
 	print(filename)
-	fp = open(filename,"r",encoding="utf-8")
+	fp = open(filename,"r",encoding="utf-8",errors='ignore')
 	lines = fp.readlines()
 	fp.close()
 	len_lines = len(lines)
 	flag = 0
 	count = 0
 	for i in range(0,len_lines):
-		if lines[i][0] == '0':
-			break
+		# if lines[i][0] == '0':
+		# 	break
 		if lines[i][0] != "#" and lines[i][0] != '\n' and flag == 0:
 			list_node.clear()
 			node_set.clear()
 			num = lines[i].split('\n',1)
 			print("num: "+num[0])
 			num_node = int(num[0])
+			if num_node == 0:
+				break
 			
 			flag = num_node
 			for x in range(1,num_node+1):
