@@ -6,6 +6,7 @@ from tkinter import *
 from operator import itemgetter,attrgetter
 from tkinter.filedialog import askopenfilename
 from tkinter import ttk
+import copy
 
 class Node:
     slope = 0
@@ -19,8 +20,22 @@ class Edge:
         self.node1 = node1
         self.node2 = node2
 
+class Line:
+    def __init__(self,node1,node2):
+        self.node1 = node1
+        self.node2 = node2
+        self.ID = w.create_line(node1.x,node1.y,node2.x,node2.y)
+class Graph:
+    def __init__(self,edgelist,nodelist):
+        self.edgelist = edgelist
+        self.nodelist = nodelist
+
 canvas_width = 600
 canvas_height = 600
+divide_index = 0
+divide_l = {}
+divide_r = {}
+step_color = 1
 list_node = []
 list_edge = []
 list_draw_edge = []
@@ -36,8 +51,34 @@ par_convex = []
 node_convex = []
 alreadynode = []
 alreadyedge = []
-convex_edge = []
+convex_edge = {}
 hull_node = []
+
+def divide(alist):
+    global divide_index,divide_l,divide_divide_lr,step_color
+    step_color = 1
+    num = len(alist)
+    if num == 2:
+        divide_l[divide_index] = alist[0:1]
+        divide_r[divide_index] = alist[1:]
+        divide_index += 1
+    elif num == 3:
+        divide_l[divide_index] = alist[0:2]
+        divide_r[divide_index] = alist[2:]
+        divide_index += 1
+        divide(alist[0:2])
+    elif num == 1:
+        return -1
+    else:
+        half_num = int(num/2)
+        print(half_num)
+        divide_l[divide_index] = alist[0:half_num]
+        divide_r[divide_index] = alist[half_num:]
+        divide_index += 1
+        divide(alist[0:half_num])
+        divide(alist[half_num:])
+
+    return divide_index
 
 def delete_node_on_w():
     for i in alreadynode:
@@ -86,9 +127,8 @@ def pre_convex(alist):
 def convexhull(alist):
     hull_node.clear()
     num = len(alist)
-    x = (alist[len(alist)//2].x + alist[len(alist)//2+1].x)/2
     pre_convex(alist)
-    delete_node_on_w()
+    #delete_node_on_w()
     draw_node(left_convex,'blue')
     draw_node(right_convex,'red')
     draw_node(par_convex,'gray')
@@ -143,14 +183,75 @@ def convexhull(alist):
     return hull_node
 
 def show_convexhull():
+    con_edge = []
     for i in hull_node:
         print("("+str(i.x)+","+str(i.y)+")")
     for i in range(0,len(hull_node)-1):
-        alreadyedge.append(w.create_line(hull_node[i].x,hull_node[i].y,hull_node[i+1].x,hull_node[i+1].y))
-    alreadyedge.append(w.create_line(hull_node[len(hull_node)-1].x,hull_node[len(hull_node)-1].y,hull_node[0].x,hull_node[0].y))
-
+        #ltemp = w.create_line(hull_node[i].x,hull_node[i].y,hull_node[i+1].x,hull_node[i+1].y)
+        #alreadyedge.append(ltemp)
+        temp = Line(hull_node[i],hull_node[i+1])
+        alreadyedge.append(temp)
+        con_edge.append(temp)
+    #alreadyedge.append(w.create_line(hull_node[len(hull_node)-1].x,hull_node[len(hull_node)-1].y,hull_node[0].x,hull_node[0].y))
+    temp = Line(hull_node[len(hull_node)-1],hull_node[0])
+    alreadyedge.append(temp)
+    con_edge.append(temp)
+    return con_edge
 def stepconvex():
-    return
+    global step_color,divide_index,divide_l,divide_r
+    if divide_index <= 0:
+        return
+    if step_color == 0:
+        draw_node(divide_l[divide_index],"black")
+        draw_node(divide_r[divide_index],"black")
+    divide_index -= 1
+    draw_node(divide_l[divide_index],"red")
+    draw_node(divide_r[divide_index],"green")
+    clist = copy.deepcopy(divide_l[divide_index])
+    con = convexhull(clist)
+    con_l = Graph(show_convexhull(),con)
+    clist = copy.deepcopy(divide_r[divide_index])
+    con = convexhull(clist)
+    con_r = Graph(show_convexhull(),con)
+    draw = copy.deepcopy(divide_l[divide_index])
+    draw += divide_r[divide_index]
+    con_node = convexhull(draw)
+    con_now = Graph(show_convexhull(),con_node)
+    for li in con_l.edgelist:
+        f = 0
+        for i in con_now.edgelist:
+            if li.node1.x==i.node1.x and li.node1.y==i.node1.y and li.node2.x==i.node2.x and li.node2.y==i.node2.y:
+                f = 1
+            elif li.node1.x==i.node2.x and li.node1.y==i.node2.y and li.node2.x==i.node1.x and li.node2.y==i.node1.y:
+                f = 1
+        if f == 0:
+            print("delete edge")
+            for i in alreadyedge:
+                if i.node1.x==li.node1.x and i.node1.y==li.node1.y and i.node2.x==li.node2.x and i.node2.y==li.node2.y:
+                    w.delete(i.ID)
+                elif i.node1.x==li.node2.x and i.node1.y==li.node2.y and i.node2.x==li.node1.x and i.node2.y==li.node1.y:
+                    w.delete(i.ID)
+    for li in con_r.edgelist:
+        f = 0
+        for i in con_now.edgelist:
+            if li.node1.x==i.node1.x and li.node1.y==i.node1.y and li.node2.x==i.node2.x and li.node2.y==i.node2.y:
+                f = 1
+            elif li.node1.x==i.node2.x and li.node1.y==i.node2.y and li.node2.x==i.node1.x and li.node2.y==i.node1.y:
+                f = 1
+        if f == 0:
+            print("delete edge")
+            for i in alreadyedge:
+                if i.node1.x==li.node1.x and i.node1.y==li.node1.y and i.node2.x==li.node2.x and i.node2.y==li.node2.y:
+                    w.delete(i.ID)
+                elif i.node1.x==li.node2.x and i.node1.y==li.node2.y and i.node2.x==li.node1.x and i.node2.y==li.node1.y:
+                    w.delete(i.ID)
+
+
+
+    #for i in alreadyedge:
+        #if i.node1
+    if step_color == 1:
+        step_color = 0
 
 def slope(node1,node2):
     if node1.x == node2.x:
@@ -225,8 +326,8 @@ def clean():
 
 def draw_node(alist,color):
     for i in alist:
-        x1, y1 = int(i.x)-2, int(i.y)-2
-        x2, y2 = int(i.x)+2, int(i.y)+2
+        x1, y1 = int(i.x)-3, int(i.y)-3
+        x2, y2 = int(i.x)+3, int(i.y)+3
         alreadynode.append(w.create_oval(x1, y1, x2, y2, fill=color))
 def draw_edge(edge):
 	w.create_line(edge.node1.x, edge.node1.y, edge.node2.x, edge.node2.y)
@@ -504,6 +605,9 @@ btn_run.pack()
 
 btn_convex = Button(master,text="convexhull",command=lambda: convexhull(list_node))
 btn_convex.pack()
+
+btn_divide = Button(master,text="divide node",command=lambda: divide(list_node))
+btn_divide.pack()
 
 btn_step_convex = Button(master, text="step by step run convex hull",command=stepconvex)
 btn_step_convex.pack()
